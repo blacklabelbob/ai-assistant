@@ -9,9 +9,13 @@ from datetime import datetime
 # Load environment variables
 load_dotenv()
 
+# Get API keys from Streamlit secrets
+anthropic_api_key = st.secrets["ANTHROPIC_API_KEY"]
+openai_api_key = st.secrets["OPENAI_API_KEY"]
+
 # Initialize API clients
-anthropic = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
-openai.api_key = os.getenv('OPENAI_API_KEY')
+anthropic_client = Anthropic(api_key=anthropic_api_key)
+openai_client = openai.Client(api_key=openai_api_key)
 
 # Initialize ChromaDB
 client = chromadb.Client()
@@ -25,7 +29,7 @@ st.sidebar.header("API Status")
 
 # Test Anthropic API
 try:
-    anthropic_response = anthropic.messages.create(
+    anthropic_response = anthropic_client.messages.create(
         model="claude-3-sonnet-20240229",
         max_tokens=10,
         messages=[{
@@ -39,7 +43,7 @@ except Exception as e:
 
 # Test OpenAI API
 try:
-    openai_response = openai.chat.completions.create(
+    openai_response = openai_client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": "Say 'OpenAI test successful' briefly"}],
         max_tokens=10
@@ -72,7 +76,7 @@ if prompt := st.chat_input():
     try:
         # Get response based on selected model
         if model_choice == "Claude (Anthropic)":
-            response = anthropic.messages.create(
+            response = anthropic_client.messages.create(
                 model="claude-3-sonnet-20240229",
                 max_tokens=1024,
                 messages=[{
@@ -82,7 +86,7 @@ if prompt := st.chat_input():
             )
             assistant_response = response.content[0].text
         else:  # OpenAI
-            response = openai.chat.completions.create(
+            response = openai_client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=1024
