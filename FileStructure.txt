@@ -1,0 +1,6 @@
+your-project/
+├── app.py
+├── requirements.txt
+├── .env
+└── utils/
+    └── database.py
